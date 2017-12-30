@@ -8,7 +8,8 @@
  * @param this.websocket_port Int the port where the stream will be relayed to
  * @constructor
  */
-function WebsocketRelay(stream_secret, stream_port,websocket_port){
+var exports = module.exports = {}
+exports.WebSocketRelay = function (stream_secret, stream_port,websocket_port){
     this.fs = require('fs');
     this.http = require('http');
     this.WebSocket = require('ws');
@@ -94,12 +95,12 @@ function WebsocketRelay(stream_secret, stream_port,websocket_port){
         console.log('Listening for incomming MPEG-TS Stream on http://127.0.0.1:'+this.stream_port+'/<secret>');
         console.log('Awaiting WebSocket connections on ws://127.0.0.1:'+this.websocket_port+'/');
 
-    }
+    };
 
     this.initiateService = function(){
-        this.socketServerConnectionInformation()
-        this.socketServerBroadcast()
-        this.startListener()
+        this.socketServerConnectionInformation();
+        this.socketServerBroadcast();
+        this.startListener();
     }
 }
 
