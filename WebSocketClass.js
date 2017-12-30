@@ -104,8 +104,5 @@ function WebsocketRelay(stream_secret, stream_port,websocket_port){
 }
 
 
-var test = new WebsocketRelay('supersecret',8081,8082)
-test.initiateService()
-
 
 
