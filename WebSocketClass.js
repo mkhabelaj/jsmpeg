@@ -15,21 +15,24 @@ function WebsocketRelay(stream_secret, stream_port,websocket_port){
     this.stream_secret = stream_secret;
     this.stream_port = stream_port;
     this.websocket_port  = websocket_port;
-    this.socketServer = new this.WebSocket.Server({port: this.websocket_port, perMessageDeflate: false})
-    this.socketServer.connectionCount = 0
+    this.socketServer = new this.WebSocket.Server({port: this.websocket_port, perMessageDeflate: false});
+    this.socketServer.connectionCount = 0;
+    var self = this;
+
     this.socketServerConnectionInformation = function () {
+
         console.log('Setting up connection information')
         this.socketServer.on('connection',function (socket, upgradeReq) {
             console.log(
                 'New WebSocket Connection: ',
                 (upgradeReq || socket.upgradeReq).socket.remoteAddress,
                 (upgradeReq || socket.upgradeReq).headers['user-agent'],
-                '('+this.socketServer.connectionCount+' total)'
+                '('+self.socketServer.connectionCount+' total)'
             );
             socket.on('close', function(code, message){
-                this.socketServer.connectionCount--;
+                self.socketServer.connectionCount--;
                 console.log(
-                    'Disconnected WebSocket ('+this.socketServer.connectionCount+' total)'
+                    'Disconnected WebSocket ('+self.socketServer.connectionCount+' total)'
                 );
             });
         })
@@ -39,8 +42,8 @@ function WebsocketRelay(stream_secret, stream_port,websocket_port){
     this.socketServerBroadcast = function () {
         console.log('Setting up Broadcast')
         this.socketServer.broadcast = function(data) {
-            this.socketServer.clients.forEach(function each(client) {
-                if (client.readyState === WebSocket.OPEN) {
+            self.socketServer.clients.forEach(function each(client) {
+                if (client.readyState === self.WebSocket.OPEN) {
                     client.send(data);
                 }
             });
@@ -50,11 +53,11 @@ function WebsocketRelay(stream_secret, stream_port,websocket_port){
 
     this.startListener = function () {
         console.log('Starting Lister')
-        // this.http Server to accept incomming MPEG-TS Stream from ffmpeg
+        // http Server to accept incomming MPEG-TS Stream from ffmpeg
         var streamServer = this.http.createServer( function(request, response) {
             var params = request.url.substr(1).split('/');
 
-            if (params[0] !== this.stream_secret) {
+            if (params[0] !== self.stream_secret) {
                 console.log(
                     'Failed Stream Connection: '+ request.socket.remoteAddress + ':' +
                     request.socket.remotePort + ' - wrong secret.'
@@ -69,7 +72,7 @@ function WebsocketRelay(stream_secret, stream_port,websocket_port){
                 request.socket.remotePort
             );
             request.on('data', function(data){
-                socketServer.broadcast(data);
+                self.socketServer.broadcast(data);
                 if (request.socket.recording) {
                     request.socket.recording.write(data);
                 }
