@@ -21,15 +21,13 @@ fi
 
 echo "creating screen for project ${PROJECT_NAME}, descriptor ${DESCRIPTOR}"
 #Check if project exists before initializing it again
-#if ! screen -list | grep -q $PROJECT_NAME; then
-screen -AdmS $PROJECT_NAME -t "${DESCRIPTOR} \n"
-echo "done"
-#else
-#    echo "Screen already start, adding extra websocket......"
-#fi
+if ! screen -list | grep -q $PROJECT_NAME; then
+    screen -AdmS $PROJECT_NAME -t "${DESCRIPTOR} \n"
+else
+    echo "project name already exists";
+    exit 1;
+fi
 #create the screen can run start the web socket relay
 screen -S $PROJECT_NAME -t $DESCRIPTOR -X stuff "node startWebSocket.js '${ELEMENT}' \n"
-
-echo "done"
 
 
